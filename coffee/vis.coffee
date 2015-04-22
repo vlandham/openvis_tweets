@@ -192,6 +192,10 @@ Plot = () ->
   mouseout = (d,i) ->
     tooltip.hideTooltip()
 
+  mouseclick = (d,i) ->
+    url = "https://twitter.com/x/status/#{d["ID"]}"
+    window.open(url, "_blank")
+
 
   update = () ->
     # points = g.append("g").attr("id", "vis_points")
@@ -222,6 +226,8 @@ Plot = () ->
       .attr("opacity", (d) -> if d.rt then 0.3 else 0.8)
       .on("mouseover", mouseover)
       .on("mouseout", mouseout)
+      .on("click", mouseclick)
+
     points.exit().remove()
 
     halos = days.selectAll(".halo")
@@ -238,6 +244,7 @@ Plot = () ->
       .attr("opacity", (d) -> if d.rt then 0.3 else 0.3)
       .on("mouseover", mouseover)
       .on("mouseout", mouseout)
+      .on("click", mouseclick)
 
     points = days.selectAll(".point")
       .data(((n) -> n.values.filter((d) -> d.show)), ((d) -> d["ID"]))
