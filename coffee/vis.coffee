@@ -155,7 +155,7 @@ Plot = () ->
     mdata = _.cloneDeep(startData)
     mdata.forEach (n) ->
       n.values = n.values.filter (d) ->
-        d["Screen name"].toLowerCase().includes(user) || d["Text"].toLowerCase().includes(user)
+        (d["Screen name"].toLowerCase().indexOf(user) != -1) || (d["Text"].toLowerCase().indexOf(user) != -1)
       n
     mdata
 
