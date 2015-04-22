@@ -32,13 +32,14 @@ body {
 }
 
 .day-title {
-  font-size: 80%;
-  color: #777;
+  font-size: 70%;
+  fill: #888;
 }
 
 .time-title {
-  font-size: 80%;
-  color: #777;
+  font-size: 60%;
+  fill: #888;
+  pointer-events:none;
 }
 
 .green {

@@ -1,7 +1,7 @@
 
 root = exports ? this
 
-names = ["jeffrey_heer", "laurmccarthy", "vlandham", "ramik", "lenagroeger","philogb","iwebst", "nigelblue", "jonobr1", "awoodruff", "eagereyes", "moebio", "hfairfield", "ilyabo", "alykat", "laneharrison", "dominikus", "fisherdanyel", "adamperer", "vlh","cambecc", "arnicas", "ireneros", "#openvisconf"]
+names = ["jeffrey_heer", "laurmccarthy", "vlandham", "ramik", "lenagroeger","philogb","iwebst", "nigelblue", "jonobr1", "awoodruff", "eagereyes", "moebio", "hfairfield", "ilyabo", "alykat", "laneharrison", "dominikus", "fisherdanyel", "adamperer", "vlh","cambecc", "arnicas", "boaz", "#openvisconf"]
 
 titles = ["Jeffrey Heer", "Lauren McCarthy", "Jim V", "Ramik Sadana", "Lena Groeger", "Nicolas G Belmonte", "Ian Webster", "Nigel Holmes", "Jono Brandel", "Andy Woodruff", "Robert Kosara"]
 
@@ -129,7 +129,7 @@ Plot = () ->
   margin = {top: 20, right: 50, bottom: 30, left: 40}
   timeScale = d3.scale.linear().domain([0,10]).range([0,height])
   dayScale = d3.scale.ordinal().rangePoints([0,width], 1.0)
-  rScale = d3.scale.sqrt().range([6, 40])
+  rScale = d3.scale.sqrt().range([5, 40])
   startSecs = 60 * 60 * 6 * 500
   secsInDay = (1000 * 60 * 60 * 24) # - (startSecs)
   # startSecs = 0
@@ -142,7 +142,7 @@ Plot = () ->
 
   filterDay = (startData) ->
     startData.filter (n) ->
-      n.key == "6" || n.key == "7"
+      n.key == "6" || n.key == "7" || n.key == "8"
 
   # filterUser = (user) ->
   #   console.log(user)
@@ -168,7 +168,7 @@ Plot = () ->
 
       timeScale.domain([startSecs, secsInDay])
       # dayScale.domain(data.map (d) -> d.key)
-      dayScale.domain(["6","7"])
+      dayScale.domain(["6","7", "8"])
       tweetExtent = d3.extent(data, (n) -> d3.max(n.values, (d) -> d.retweets))
       rScale.domain(tweetExtent)
 
@@ -206,7 +206,6 @@ Plot = () ->
     #   .attr("transform", (n,i) -> "translate(#{width * i},0)")
     days = g.selectAll(".day")
       .data((n) -> filterUser(filterDay(allData), n)).enter()
-      # .data(data).enter()
       .append("g")
       .attr("class", "day")
       .attr("transform", (n) -> "translate(#{dayScale(n.key)},0)")
@@ -216,10 +215,6 @@ Plot = () ->
     points.enter()
       .append("circle")
       .attr("cy", (d) -> timeScale(d.diffDate))
-      # .attr("cy", (d) -> dayScale(yValue(d)))
-      # .attr("cy", (d) -> height / 3)
-      # .attr("r", 6)
-      # .attr("r", (d) -> rScale(d.retweets))
       .attr("r",  4)
       .attr("class", "point")
       .attr("fill", (d) -> color(d.rt))
@@ -255,7 +250,7 @@ Plot = () ->
       .attr("y", 10)
       .attr("text-anchor", "middle")
 
-    daytitles = [{day:"6", title:"day 1"},{day:"7", title:"day 2"}]
+    daytitles = [{day:"6", title:"day 1"},{day:"7", title:"day 2"}, {day:"8", title:"day after"}]
     g.selectAll(".day-title").data(daytitles)
       .enter()
       .append("text")
@@ -263,7 +258,7 @@ Plot = () ->
       .attr("text-anchor", "middle")
       .attr("x", (d) -> dayScale(d.day))
       .attr("y", height)
-      .attr("dy", 20)
+      .attr("dy", (d,i) -> if i == 1 then 20 else 10)
       .text((d) -> d.title)
 
     timetitles = g.selectAll(".time-title").data((n) -> if starts[n] then [starts[n]] else [])
@@ -272,11 +267,16 @@ Plot = () ->
       .attr("class", "time-title")
       .attr("x", (d) -> dayScale(d.day))
       .attr("y", (d) -> timeScale((d.diff * 60 * 60 * 1000) - startSecs))
-      .attr("dx", (d) -> if d.day == "6" then -70 else 30)
+      .attr("dx", (d) -> if d.day == "6" then -50 else 30)
       .attr("dy", -5)
       .attr("text-anchor", (d) -> if d.day == "6" then "right" else "left")
       .text((d) -> if d.hour then d.hour else timeString(d.diff))
 
+    g.attr("opacity", 1e-6)
+    g.transition()
+      .duration(600)
+      .delay((d,i) -> i * 200)
+      .attr("opacity",1.0)
 
   chart.filter = (user) ->
     filterUser(user)
