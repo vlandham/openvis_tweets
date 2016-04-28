@@ -17,5 +17,3 @@ thin start
 </pre>
 
 Now go to "http://0.0.0.0:3000":http://0.0.0.0:3000/
-
-and you have a basic visualization
