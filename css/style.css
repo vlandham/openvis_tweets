@@ -13,6 +13,10 @@ body {
   /* line-height: 50px; */
 }
 
+#vis {
+  margin:auto;
+}
+
 .tooltip {
 	position: absolute;
 	top: 100px;
@@ -47,6 +51,14 @@ body {
 }
 .yellow {
   color: rgb(183,138,67);
+}
+
+.point {
+  cursor: pointer;
+}
+
+.halo {
+  cursor: pointer;
 }
 
 

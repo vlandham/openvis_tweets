@@ -1,11 +1,20 @@
 
 root = exports ? this
 
-names = ["jeffrey_heer", "laurmccarthy", "vlandham", "ramik", "lenagroeger","philogb","iwebst", "nigelblue", "jonobr1", "awoodruff", "eagereyes", "moebio", "hfairfield", "ilyabo", "alykat", "laneharrison", "dominikus", "fisherdanyel", "adamperer", "vlh","cambecc", "arnicas", "boaz", "#openvisconf"]
+years = {'2015':{}, '2016':{}}
 
-titles = ["Jeffrey Heer", "Lauren McCarthy", "Jim V", "Ramik Sadana", "Lena Groeger", "Nicolas G Belmonte", "Ian Webster", "Nigel Holmes", "Jono Brandel", "Andy Woodruff", "Robert Kosara"]
+YEAR = '2016'
 
-starts = {
+years['2015'].filename = 'data/openvis_2015.csv'
+
+
+years['2015'].daytitles = [{day:"6", title:"day 1"},{day:"7", title:"day 2"}, {day:"8", title:"day after"}]
+
+years['2015'].names = ["jeffrey_heer", "laurmccarthy", "vlandham", "ramik", "lenagroeger","philogb","iwebst", "nigelblue", "jonobr1", "awoodruff", "eagereyes", "moebio", "hfairfield", "ilyabo", "alykat", "laneharrison", "dominikus", "fisherdanyel", "adamperer", "vlh","cambecc", "arnicas", "boaz", "#openvisconf"]
+
+years['2015'].titles = ["Jeffrey Heer", "Lauren McCarthy", "Jim V", "Ramik Sadana", "Lena Groeger", "Nicolas G Belmonte", "Ian Webster", "Nigel Holmes", "Jono Brandel", "Andy Woodruff", "Robert Kosara"]
+
+years['2015'].starts = {
   "jeffrey_heer":{diff:9 , day:"6"},
   "laurmccarthy":{diff:10, day:"6"}
   "vlandham":{diff:11, day:"6"}
@@ -28,6 +37,14 @@ starts = {
   "vlh":{diff:16 , day:"7"}
   "cambecc":{diff:17 , day:"7"}
 }
+
+years['2015'].starts = {}
+
+years['2016'].names = ['wattenberg', 'viegasf', 'kcimc', 'kosamari', 'ncasenmare', 'ameliamn', 'nadiehbremer', 'patriciogv', 'zanstrong', 'sxywu', 'tonyhschu', 'monachalabi', 'yan0', 'kennelliott', 'rachelbinx', 'arvindsatya1', 'adamrpearce', 'jessicahullman', 'kimay', 'chrisnf', 'ana_becker', 'arnicas', 'ireneros', '#openvisconf']
+years['2016'].starts = {}
+years['2016'].filename = 'data/openvis_2016.csv'
+
+years['2016'].daytitles = [{day:"25", title:"day 1"},{day:"26", title:"day 2"}, {day:"27", title:"day after"}]
 
 timeString = (hour) ->
   hr = ""
@@ -81,6 +98,8 @@ setupData = (data) ->
     d.time = d.date.getTime()
     d.rt = d["Text"].startsWith("RT")
     d.day = d.date.getDate()
+
+
     # d.day = d.date.date()
 
 
@@ -142,7 +161,9 @@ Plot = () ->
 
   filterDay = (startData) ->
     startData.filter (n) ->
-      n.key == "6" || n.key == "7" || n.key == "8"
+      days = years[YEAR].daytitles.map((d) -> d.day)
+      days.indexOf(n.key) != -1
+      # n.key == "25" || n.key == "26" || n.key == "27"
 
   # filterUser = (user) ->
   #   console.log(user)
@@ -168,11 +189,15 @@ Plot = () ->
 
       timeScale.domain([startSecs, secsInDay])
       # dayScale.domain(data.map (d) -> d.key)
-      dayScale.domain(["6","7", "8"])
+
+      # dayScale.domain(["6","7", "8"])
+      days = years[YEAR].daytitles.map((d) -> d.day)
+      dayScale.domain(days)
+
       tweetExtent = d3.extent(data, (n) -> d3.max(n.values, (d) -> d.retweets))
       rScale.domain(tweetExtent)
 
-      svg = d3.select(this).selectAll("svg").data(names)
+      svg = d3.select(this).selectAll("svg").data(years[YEAR].names)
       gEnter = svg.enter().append("svg").append("g")
 
       svg.attr("width", width + margin.left + margin.right )
@@ -250,8 +275,7 @@ Plot = () ->
       .attr("y", 10)
       .attr("text-anchor", "middle")
 
-    daytitles = [{day:"6", title:"day 1"},{day:"7", title:"day 2"}, {day:"8", title:"day after"}]
-    g.selectAll(".day-title").data(daytitles)
+    g.selectAll(".day-title").data(years[YEAR].daytitles)
       .enter()
       .append("text")
       .attr("class", "day-title")
@@ -261,7 +285,7 @@ Plot = () ->
       .attr("dy", (d,i) -> if i == 1 then 20 else 10)
       .text((d) -> d.title)
 
-    timetitles = g.selectAll(".time-title").data((n) -> if starts[n] then [starts[n]] else [])
+    timetitles = g.selectAll(".time-title").data((n) -> if years[YEAR].starts[n] then [years[YEAR].starts[n]] else [])
       .enter()
     timetitles.append("text")
       .attr("class", "time-title")
@@ -327,6 +351,16 @@ $ ->
 
 
   queue()
-    .defer(d3.csv, "data/openvis.csv")
+    .defer(d3.csv, years[YEAR].filename)
     .await(display)
 
+  d3.select('.year_select').on 'change', (e) ->
+    newYear = d3.event.target.value
+    if newYear != YEAR
+      console.log(newYear)
+      YEAR = newYear
+      d3.select("#vis").selectAll('svg').remove()
+
+      queue()
+        .defer(d3.csv, years[YEAR].filename)
+        .await(display)
